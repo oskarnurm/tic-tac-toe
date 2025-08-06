@@ -1,0 +1,16 @@
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 150px);
+  grid-template-rows: repeat(3, 150px);
+  gap: 2px;
+  padding: 2px;
+}
+
+.cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
+  border: 1px solid grey;
+  cursor: pointer;
+}

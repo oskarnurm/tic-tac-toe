@@ -12,9 +12,6 @@ function Gameboard() {
 
   const getBoard = () => board;
   const setToken = (row, column, player) => {
-    // board[row][column].getValue()
-    //   ? console.log("Already drawn")
-    //   : board[row][column].addToken(player);
     if (board[row][column].getValue()) {
       return false;
     } else {
@@ -33,15 +30,8 @@ function Gameboard() {
   return { getBoard, setToken, printBoard };
 }
 
-/*
- ** A Cell represents one "square" on the board and can have one of
- ** 0: no token is in the square,
- ** 1: Player One's token,
- ** 2: Player 2's token
- */
-
 function Cell() {
-  let value = 0;
+  let value = null;
 
   // Accept a player's token to change the value of the cell
   const addToken = (player) => {
@@ -83,6 +73,7 @@ function GameController(
   playerOneName = "Player One",
   playerTwoName = "Player Two",
 ) {
+  let count = 0;
   const board = Gameboard();
 
   const players = [
@@ -105,26 +96,29 @@ function GameController(
 
   const printNewRound = () => {
     board.printBoard();
-    console.log(`${getActivePlayer().token}'s turn.`);
+    if (checkWinner(board.getBoard())) {
+      console.log(`${getActivePlayer().name} wins!`);
+    } else if (count === 9) {
+      board.printBoard();
+      console.log("It's a tie!");
+    } else {
+      console.log(
+        `${getActivePlayer().name} (${getActivePlayer().token})'s turn.`,
+      );
+    }
   };
 
   const playRound = (column, row) => {
     if (board.setToken(row, column, getActivePlayer().token)) {
       console.log(
-        `Drawing ${getActivePlayer().name}'s token into ${(column, row)}...`,
+        `Drawing ${getActivePlayer().name}'s token into ${column},${row}...`,
       );
-      // Switch player turn
+      count++;
       switchPlayerTurn();
     } else {
       console.log(`Not allowed to draw over, choose a different cell`);
     }
-
-    const winner = checkWinner(board.getBoard());
-    if (winner) {
-      console.log(`${getActivePlayer().name} wins!`);
-    } else {
-      printNewRound();
-    }
+    printNewRound();
   };
 
   printNewRound();
@@ -134,7 +128,58 @@ function GameController(
   return {
     playRound,
     getActivePlayer,
+    getBoard: board.getBoard,
   };
 }
 
-const game = GameController();
+function ScreenController() {
+  const game = GameController();
+  const playerTurnDiv = document.querySelector(".turn");
+  const boardDiv = document.querySelector(".board");
+
+  const updateScreen = () => {
+    // clear the board
+    boardDiv.textContent = "";
+
+    // get the newest version of the board and player turn
+    const board = game.getBoard();
+    const activePlayer = game.getActivePlayer();
+
+    // Display player's turn
+    playerTurnDiv.textContent = `${activePlayer.name}'s turn...`;
+
+    // Render board squares
+    board.forEach((row, i) => {
+      row.forEach((cell, j) => {
+        // Anything clickable should be a button!!
+        const cellButton = document.createElement("button");
+        cellButton.classList.add("cell");
+        // Create a data attribute to identify the column
+        // This makes it easier to pass into our `playRound` function
+        cellButton.dataset.column = j;
+        cellButton.dataset.row = i;
+        cellButton.textContent = cell.getValue();
+        boardDiv.appendChild(cellButton);
+      });
+    });
+  };
+
+  // Add event listener for the board
+  function clickHandlerBoard(e) {
+    const selectedColumn = e.target.dataset.column;
+    const selectedRow = e.target.dataset.row;
+    // Make sure I've clicked a column and not the gaps in between
+    if (!selectedColumn && !selectedRow) return;
+
+    game.playRound(selectedColumn, selectedRow);
+    updateScreen();
+  }
+  boardDiv.addEventListener("click", clickHandlerBoard);
+
+  // Initial render
+  updateScreen();
+
+  // We don't need to return anything from this module because everything is encapsulated inside this screen controller.
+}
+
+ScreenController();
