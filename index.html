@@ -10,7 +10,29 @@
     <div class="container">
       <h1 class="turn"></h1>
       <div class="board"></div>
+      <div class="scoreboard">
+        <h1>Score:</h1>
+        <p class="score"></p>
+      </div>
     </div>
+
+    <dialog id="popup">
+      <form method="dialog">
+        <header>
+          <h3>Game over!</h3>
+          <button type="button" aria-label="Close" onclick="popup.close()">
+            ✕
+          </button>
+        </header>
+        <section>
+          <p class="result"></p>
+        </section>
+        <footer>
+          <button value="reset">Reset game</button>
+          <button value="next">Next round</button>
+        </footer>
+      </form>
+    </dialog>
     <script src="script.js"></script>
   </body>
 </html>
