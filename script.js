@@ -68,8 +68,8 @@ function GameController(
   const board = Gameboard();
 
   const players = [
-    { name: playerOneName, token: "○", score: 0 },
-    { name: playerTwoName, token: "✕", score: 0 },
+    { name: playerOneName, token: "O", score: 0 },
+    { name: playerTwoName, token: "X", score: 0 },
   ];
 
   let activePlayer = players[0];
@@ -85,8 +85,7 @@ function GameController(
 
   const getActivePlayer = () => activePlayer;
 
-  const getPlayerScores = () => `${players[0].name}: ${players[0].score}
-                                ${players[1].name}: ${players[1].score}`;
+  const getPlayers = () => players;
 
   const resetPlayerScores = () => {
     ((players[0].score = 0), (players[1].score = 0));
@@ -132,9 +131,9 @@ function GameController(
     getWinner,
     isTie,
     resetRound,
-    getPlayerScores,
     resetPlayerScores,
     setPlayerNames,
+    getPlayers,
   };
 }
 
@@ -144,8 +143,14 @@ function ScreenController() {
   const playerTurnDiv = document.querySelector(".turn");
   const boardDiv = document.querySelector(".board");
   const popupDiv = document.getElementById("popup");
-  const scoreDiv = document.querySelector(".score");
+  const player1Div = document.querySelector(".score .player1");
+  const player2Div = document.querySelector(".score .player2");
+
   const formDiv = document.querySelector(".form");
+
+  window.onload = () => {
+    document.getElementById("welcome").showModal();
+  };
 
   formDiv.addEventListener("submit", () => {
     const input1 = formDiv.elements.player1.value;
@@ -159,6 +164,12 @@ function ScreenController() {
     updateScreen();
     formDiv.reset();
   });
+
+  function updateScores() {
+    const [player1, player2] = game.getPlayers();
+    player1Div.textContent = `${player1.name}: ${player1.score}`;
+    player2Div.textContent = `${player2.name}: ${player2.score}`;
+  }
 
   const updateScreen = () => {
     boardDiv.textContent = "";
@@ -176,7 +187,7 @@ function ScreenController() {
       popupDiv.querySelector(".result").textContent = `Tie!`;
       popupDiv.showModal();
     } else {
-      playerTurnDiv.textContent = `${activePlayer.name}'s turn...`;
+      playerTurnDiv.textContent = `${activePlayer.name}'s turn`;
     }
 
     // Render board
@@ -190,9 +201,7 @@ function ScreenController() {
         boardDiv.appendChild(cellButton);
       });
     });
-
-    // Render scoreBoard
-    scoreDiv.textContent = game.getPlayerScores();
+    updateScores();
   };
 
   // Add event listener for the board
@@ -210,7 +219,7 @@ function ScreenController() {
   function resetRound() {
     game.resetRound();
     boardDiv.querySelectorAll(".cell").forEach((btn) => (btn.textContent = ""));
-    playerTurnDiv.textContent = `${game.getActivePlayer().name}'s turn...`;
+    playerTurnDiv.textContent = `${game.getActivePlayer().name}'s turn`;
   }
 
   popupDiv.addEventListener("close", () => {
@@ -220,12 +229,11 @@ function ScreenController() {
     } else if (response === "reset") {
       resetRound();
       game.resetPlayerScores();
-      document.querySelector(".score").textContent = game.getPlayerScores();
+      updateScores();
     } else {
       return;
     }
   });
-
   // Initial render
   updateScreen();
 }

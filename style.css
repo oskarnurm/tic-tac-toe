@@ -1,9 +1,30 @@
+* {
+  box-sizing: border-box;
+  font-family: sans-serif;
+  line-height: 1.5;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #eeeae3;
+  color: #333;
+  letter-spacing: 0.1em;
+}
+
+.turn {
+  font-weight: 500;
+}
+
 .board {
   display: grid;
   grid-template-columns: repeat(3, 150px);
   grid-template-rows: repeat(3, 150px);
-  gap: 2px;
-  padding: 2px;
+  gap: 6px;
+  margin-bottom: 30px;
+  box-shadow: 0 0 10px 4px rgba(0, 0, 0, 0.1);
 }
 
 .cell {
@@ -11,6 +32,169 @@
   justify-content: center;
   align-items: center;
   font-size: 2rem;
-  border: 1px solid grey;
+  border: none;
+  background: #f2f2f0;
+}
+
+.cell:hover,
+.cell:focus {
+  background-color: #e0e0db;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  outline: none;
+}
+
+.turn {
+  display: flex;
+  justify-content: center;
+}
+
+.scoreboard h4,
+.scoreboard p {
+  margin: 0;
+  display: flex;
+  justify-content: space-evenly;
+  letter-spacing: 0.1em;
+}
+
+.score {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+dialog:not([open]) {
+  display: none;
+}
+
+dialog[open] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#welcome {
+  border-radius: 8px;
+  padding: 0;
+  background: #fff;
+}
+
+#welcome h1 {
+  margin: 1rem 0 0.5rem;
+  font-size: 1.6rem;
+  color: #222;
+}
+
+#welcome h2 {
+  margin: 0;
+  font-size: 1rem;
+  color: #555;
+}
+
+#welcome form {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#welcome form input {
+  padding: 0.5rem;
+  font-size: 1rem;
+  border-radius: 4px;
+  background: #f2f2f0;
+}
+
+#welcome form button {
+  margin-top: 0.5rem;
+  padding: 0.6rem;
+  font-size: 1rem;
+  background: #f2f2f0;
+  border: 1.5px solid #ccc;
+  border-radius: 6px;
+  transition:
+    background-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+#welcome form button:hover,
+#welcome form button:focus {
+  background-color: #e0e0db;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  outline: none;
+}
+
+dialog input {
+  border: none;
+  outline: none;
+  background: #eeeae3;
+  padding: 0.5rem;
+  margin-bottom: 5px;
+}
+
+dialog form {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+dialog header,
+dialog footer {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+}
+
+dialog header {
+  justify-content: space-between;
+  background: #f5f5f5;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+dialog header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+dialog header button {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: #8f8f8f;
   cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+dialog header button:hover {
+  color: #333;
+}
+
+dialog section {
+  padding: 0.5rem;
+  color: #333;
+  font-size: 1rem;
+}
+
+dialog footer {
+  justify-content: flex-end;
+  gap: 0.5rem;
+  background: #fafafa;
+  border-top: 1px solid #e0e0e0;
+}
+
+dialog footer button {
+  padding: 0.5rem 1rem;
+  font-size: 0.95rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: #e0e0e0;
+  transition: background 0.2s ease;
+}
+
+dialog footer button:hover {
+  background-color: #d4d4d4;
+}
+
+dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(3px);
 }

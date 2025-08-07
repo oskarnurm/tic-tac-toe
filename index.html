@@ -7,9 +7,9 @@
     <link href="style.css" rel="stylesheet" />
   </head>
   <body>
-    <dialog open>
-      <h2>Welcome! 🎉</h2>
-      <h3>Choose your names:</h3>
+    <dialog id="welcome">
+      <h1>Welcome!</h1>
+      <h2>Choose your names:</h2>
       <form class="form" method="dialog">
         <input
           type="text"
@@ -23,16 +23,19 @@
           name="player2"
           placeholder="Player two"
         />
-        <button>Play</button>
+        <button value="play">Play</button>
       </form>
     </dialog>
 
     <div class="container">
-      <h1 class="turn"></h1>
+      <h3 class="turn"></h3>
       <div class="board"></div>
       <div class="scoreboard">
-        <h1>Score:</h1>
-        <p class="score"></p>
+        <h4>Score:</h4>
+        <div class="score">
+          <div class="player1"></div>
+          <div class="player2"></div>
+        </div>
       </div>
     </div>
 
