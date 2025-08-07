@@ -96,6 +96,7 @@ function GameController(
   const switchPlayerTurn = () => {
     activePlayer = activePlayer === players[0] ? players[1] : players[0];
   };
+
   const getActivePlayer = () => activePlayer;
 
   const getPlayerScores = () => `${players[0].name}: ${players[0].score}
@@ -107,39 +108,64 @@ function GameController(
 
   const printNewRound = (status = "") => {
     board.printBoard();
-    if (checkWinner(board.getBoard())) {
+    if (status === "win") {
       console.log(`${getActivePlayer().name} wins!`);
-    } else if (count === 9) {
-      board.printBoard();
+    } else if (status === "tie") {
       console.log("It's a tie!");
     } else {
-      console.log(
-        `${getActivePlayer().name} (${getActivePlayer().token})'s turn.`,
-      );
+      console.log(`${getActivePlayer().name}'s turn...`);
     }
   };
 
   const playRound = (column, row) => {
-    if (board.setToken(row, column, getActivePlayer().token)) {
-      console.log(
-        `Drawing ${getActivePlayer().name}'s token into ${column},${row}...`,
-      );
-      count++;
-      switchPlayerTurn();
-    } else {
-      console.log(`Not allowed to draw over, choose a different cell`);
+    // Only do legal draws
+    if (!board.setToken(row, column, getActivePlayer().token)) {
+      console.log("Not allowed to draw over, choose a different cell");
+      printNewRound();
+      return;
     }
+    console.log(
+      `Drawing ${getActivePlayer().name}'s token into cell (${row}, ${column})`,
+    );
+    drawCount++;
+
+    // Check for win
+    if (checkWinner(board.getBoard())) {
+      printNewRound("win");
+      return;
+    }
+
+    // Check for tie
+    if (drawCount === board.isFull()) {
+      printNewRound("tie");
+      return;
+    }
+
+    switchPlayerTurn();
+    printNewRound();
+  };
+
+  const resetGame = () => {
+    drawCount = 0;
+    activePlayer = players[0];
+    board
+      .getBoard()
+      .flat()
+      .forEach((cell) => cell.addToken(null));
+    console.clear();
     printNewRound();
   };
 
   printNewRound();
 
-  // For the console version, we will only use playRound, but we will need
-  // getActivePlayer for the UI version, so I'm revealing it now
   return {
     playRound,
     getActivePlayer,
     getBoard: board.getBoard,
+    getWinner,
+    isTie,
+    resetGame,
+    getPlayerScores,
   };
 }
 
