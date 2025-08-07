@@ -23,14 +23,7 @@ function Gameboard() {
     }
   };
 
-  const printBoard = () => {
-    const boardWithCellValues = board.map((row) =>
-      row.map((cell) => cell.getValue()),
-    );
-    console.log(boardWithCellValues);
-  };
-
-  return { getBoard, setToken, printBoard, isFull };
+  return { getBoard, setToken, isFull };
 }
 
 function Cell() {
@@ -82,8 +75,8 @@ function GameController(
   let activePlayer = players[0];
 
   const setPlayerNames = (playerOne, playerTwo) => {
-    players[0].name = playerOne;
-    players[1].name = playerTwo;
+    players[0].name = playerOne.trim();
+    players[1].name = playerTwo.trim();
   };
 
   const switchPlayerTurn = () => {
@@ -103,43 +96,24 @@ function GameController(
 
   const isTie = () => drawCount === board.isFull() && !getWinner();
 
-  const printNewRound = (status = "") => {
-    board.printBoard();
-    if (status === "win") {
-      console.log(`${getActivePlayer().name} wins!`);
-    } else if (status === "tie") {
-      console.log("It's a tie!");
-    } else {
-      console.log(`${getActivePlayer().name}'s turn...`);
-    }
-  };
-
   const playRound = (column, row) => {
-    // Only do legal draws
+    // Don't let the user set a token to a cell that already has one
     if (!board.setToken(row, column, getActivePlayer().token)) {
-      console.log("Not allowed to draw over, choose a different cell");
-      printNewRound();
       return;
     }
-    console.log(
-      `Drawing ${getActivePlayer().name}'s token into cell (${row}, ${column})`,
-    );
     drawCount++;
 
     // Check for win
     if (checkWinner(board.getBoard())) {
-      printNewRound("win");
       return;
     }
 
     // Check for tie
     if (drawCount === board.isFull()) {
-      printNewRound("tie");
       return;
     }
 
     switchPlayerTurn();
-    printNewRound();
   };
 
   const resetRound = () => {
@@ -149,11 +123,7 @@ function GameController(
       .getBoard()
       .flat()
       .forEach((cell) => cell.addToken(null));
-    console.clear();
-    printNewRound();
   };
-
-  printNewRound();
 
   return {
     playRound,
@@ -178,8 +148,8 @@ function ScreenController() {
   const formDiv = document.querySelector(".form");
 
   formDiv.addEventListener("submit", () => {
-    const input1 = formDiv.elements.player1.value.trim();
-    const input2 = formDiv.elements.player2.value.trim();
+    const input1 = formDiv.elements.player1.value;
+    const input2 = formDiv.elements.player2.value;
 
     // Set default names if the user did not provide any
     const playerOne = input1 === "" ? "Player One" : input1;
@@ -193,20 +163,17 @@ function ScreenController() {
   const updateScreen = () => {
     boardDiv.textContent = "";
 
-    // Update board and active player in-between turns
+    // Update game info in-between rounds
     const board = game.getBoard();
     const activePlayer = game.getActivePlayer();
 
-    winner = game.getWinner();
-    if (winner) {
-      playerTurnDiv.textContent = `${activePlayer.name} wins!`;
+    if (game.getWinner()) {
       activePlayer.score++;
       popupDiv.querySelector(".result").textContent =
         `${activePlayer.name} wins!`;
       popupDiv.showModal();
     } else if (game.isTie()) {
-      playerTurnDiv.textContent = `It's a tie!`;
-      popupDiv.querySelector(".result").textContent = `It's a tie!`;
+      popupDiv.querySelector(".result").textContent = `Tie!`;
       popupDiv.showModal();
     } else {
       playerTurnDiv.textContent = `${activePlayer.name}'s turn...`;
@@ -255,7 +222,7 @@ function ScreenController() {
       game.resetPlayerScores();
       document.querySelector(".score").textContent = game.getPlayerScores();
     } else {
-      console.log("do something");
+      return;
     }
   });
 
