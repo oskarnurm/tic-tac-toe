@@ -75,18 +75,16 @@ function GameController(
   const board = Gameboard();
 
   const players = [
-    {
-      name: playerOneName,
-      token: "○",
-      score: 0,
-    },
-    {
-      name: playerTwoName,
-      token: "✕",
-      score: 0,
-    },
+    { name: playerOneName, token: "○", score: 0 },
+    { name: playerTwoName, token: "✕", score: 0 },
   ];
+
   let activePlayer = players[0];
+
+  const setPlayerNames = (playerOne, playerTwo) => {
+    players[0].name = playerOne;
+    players[1].name = playerTwo;
+  };
 
   const switchPlayerTurn = () => {
     activePlayer = activePlayer === players[0] ? players[1] : players[0];
@@ -144,7 +142,7 @@ function GameController(
     printNewRound();
   };
 
-  const resetGame = () => {
+  const resetRound = () => {
     drawCount = 0;
     activePlayer = players[0];
     board
@@ -163,9 +161,10 @@ function GameController(
     getBoard: board.getBoard,
     getWinner,
     isTie,
-    resetGame,
+    resetRound,
     getPlayerScores,
     resetPlayerScores,
+    setPlayerNames,
   };
 }
 
@@ -176,6 +175,20 @@ function ScreenController() {
   const boardDiv = document.querySelector(".board");
   const popupDiv = document.getElementById("popup");
   const scoreDiv = document.querySelector(".score");
+  const formDiv = document.querySelector(".form");
+
+  formDiv.addEventListener("submit", () => {
+    const input1 = formDiv.elements.player1.value.trim();
+    const input2 = formDiv.elements.player2.value.trim();
+
+    // Set default names if the user did not provide any
+    const playerOne = input1 === "" ? "Player One" : input1;
+    const playerTwo = input2 === "" ? "Player Two" : input2;
+
+    game.setPlayerNames(playerOne, playerTwo);
+    updateScreen();
+    formDiv.reset();
+  });
 
   const updateScreen = () => {
     boardDiv.textContent = "";
@@ -211,6 +224,7 @@ function ScreenController() {
       });
     });
 
+    // Render scoreBoard
     scoreDiv.textContent = game.getPlayerScores();
   };
 
@@ -226,8 +240,8 @@ function ScreenController() {
   }
   boardDiv.addEventListener("click", clickHandlerBoard);
 
-  function resetGame() {
-    game.resetGame();
+  function resetRound() {
+    game.resetRound();
     boardDiv.querySelectorAll(".cell").forEach((btn) => (btn.textContent = ""));
     playerTurnDiv.textContent = `${game.getActivePlayer().name}'s turn...`;
   }
@@ -235,9 +249,9 @@ function ScreenController() {
   popupDiv.addEventListener("close", () => {
     const response = popupDiv.returnValue;
     if (response === "next") {
-      resetGame();
+      resetRound();
     } else if (response === "reset") {
-      resetGame();
+      resetRound();
       game.resetPlayerScores();
       document.querySelector(".score").textContent = game.getPlayerScores();
     } else {
@@ -247,8 +261,6 @@ function ScreenController() {
 
   // Initial render
   updateScreen();
-
-  // We don't need to return anything from this module because everything is encapsulated inside this screen controller.
 }
 
 ScreenController();
