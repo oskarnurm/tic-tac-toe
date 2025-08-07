@@ -11,7 +11,10 @@ function Gameboard() {
   }
 
   const getBoard = () => board;
-  const setToken = (row, column, player) => {
+
+  const isFull = () => rows * columns;
+
+  const setToken = (row, column, token) => {
     if (board[row][column].getValue()) {
       return false;
     } else {
@@ -27,7 +30,7 @@ function Gameboard() {
     console.log(boardWithCellValues);
   };
 
-  return { getBoard, setToken, printBoard };
+  return { getBoard, setToken, printBoard, isFull };
 }
 
 function Cell() {
@@ -73,7 +76,7 @@ function GameController(
   playerOneName = "Player One",
   playerTwoName = "Player Two",
 ) {
-  let count = 0;
+  let drawCount = 0;
   const board = Gameboard();
 
   const players = [
@@ -95,7 +98,14 @@ function GameController(
   };
   const getActivePlayer = () => activePlayer;
 
-  const printNewRound = () => {
+  const getPlayerScores = () => `${players[0].name}: ${players[0].score}
+                                ${players[1].name}: ${players[1].score}`;
+
+  const getWinner = () => checkWinner(board.getBoard());
+
+  const isTie = () => drawCount === board.isFull() && !getWinner();
+
+  const printNewRound = (status = "") => {
     board.printBoard();
     if (checkWinner(board.getBoard())) {
       console.log(`${getActivePlayer().name} wins!`);
