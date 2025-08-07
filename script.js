@@ -142,14 +142,14 @@ function ScreenController() {
 
   const playerTurnDiv = document.querySelector(".turn");
   const boardDiv = document.querySelector(".board");
-  const popupDiv = document.getElementById("popup");
+  const popupDiv = document.querySelector(".popup");
   const player1Div = document.querySelector(".score .player1");
   const player2Div = document.querySelector(".score .player2");
 
   const formDiv = document.querySelector(".form");
 
   window.onload = () => {
-    document.getElementById("welcome").showModal();
+    document.querySelector(".welcome").showModal();
   };
 
   formDiv.addEventListener("submit", () => {
