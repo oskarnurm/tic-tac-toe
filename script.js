@@ -18,7 +18,7 @@ function Gameboard() {
     if (board[row][column].getValue()) {
       return false;
     } else {
-      board[row][column].addToken(player);
+      board[row][column].addToken(token);
       return true;
     }
   };
@@ -36,18 +36,13 @@ function Gameboard() {
 function Cell() {
   let value = null;
 
-  // Accept a player's token to change the value of the cell
-  const addToken = (player) => {
-    value = player;
+  const addToken = (token) => {
+    value = token;
   };
 
-  // How we will retrieve the current value of this cell through closure
   const getValue = () => value;
 
-  return {
-    addToken,
-    getValue,
-  };
+  return { addToken, getValue };
 }
 
 function checkWinner(board) {
@@ -101,6 +96,10 @@ function GameController(
 
   const getPlayerScores = () => `${players[0].name}: ${players[0].score}
                                 ${players[1].name}: ${players[1].score}`;
+
+  const resetPlayerScores = () => {
+    ((players[0].score = 0), (players[1].score = 0));
+  };
 
   const getWinner = () => checkWinner(board.getBoard());
 
@@ -166,6 +165,7 @@ function GameController(
     isTie,
     resetGame,
     getPlayerScores,
+    resetPlayerScores,
   };
 }
 
@@ -238,6 +238,8 @@ function ScreenController() {
       resetGame();
     } else if (response === "reset") {
       resetGame();
+      game.resetPlayerScores();
+      document.querySelector(".score").textContent = game.getPlayerScores();
     } else {
       console.log("do something");
     }
