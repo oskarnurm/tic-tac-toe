@@ -79,14 +79,15 @@ function GameController(
   const players = [
     {
       name: playerOneName,
-      token: "O",
+      token: "○",
+      score: 0,
     },
     {
       name: playerTwoName,
-      token: "X",
+      token: "✕",
+      score: 0,
     },
   ];
-
   let activePlayer = players[0];
 
   const switchPlayerTurn = () => {
