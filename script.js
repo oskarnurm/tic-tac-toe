@@ -1,6 +1,4 @@
 function Gameboard() {
-  const rows = 3;
-  const columns = 3;
   const board = [];
 
   for (let i = 0; i < rows; i++) {
@@ -11,19 +9,15 @@ function Gameboard() {
   }
 
   const getBoard = () => board;
-
-  const isFull = () => rows * columns;
-
-  const setToken = (row, column, token) => {
-    if (board[row][column].getValue()) {
-      return false;
-    } else {
-      board[row][column].addToken(token);
-      return true;
-    }
+  const capacity = () => 9;
+  const setToken = (row, col, token) => {
+    // Guard against setting token to a cell that already has one
+    if (board[row][col].getValue()) return false;
+    board[row][col].addToken(token);
+    return true;
   };
 
-  return { getBoard, setToken, isFull };
+  return { getBoard, setToken, capacity };
 }
 
 function Cell() {
