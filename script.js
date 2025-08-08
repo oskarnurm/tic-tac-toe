@@ -65,7 +65,8 @@ function GameController(p1 = "Player One", p2 = "Player Two") {
     players[1].name = (b ?? "").trim() || "Player Two";
   };
 
-  let activePlayer = players[0];
+  let startingPlayerIndex = 0;
+  let activePlayer = players[startingPlayerIndex];
   const switchPlayerTurn = () => {
     activePlayer = activePlayer === players[0] ? players[1] : players[0];
   };
@@ -100,7 +101,9 @@ function GameController(p1 = "Player One", p2 = "Player Two") {
   const resetRound = () => {
     moves = 0;
     gameOver = false;
-    activePlayer = players[0];
+    // Alternate starting player each round
+    startingPlayerIndex = startingPlayerIndex === 0 ? 1 : 0;
+    activePlayer = players[startingPlayerIndex];
     board
       .getBoard()
       .flat()
