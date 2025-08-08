@@ -1,7 +1,19 @@
+@font-face {
+  font-family: "JetBrainsMono";
+  src: url("./fonts/JetBrainsMono.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 * {
   box-sizing: border-box;
-  font-family: sans-serif;
+  font-family: "JetBrainsMono", sans-serif;
   line-height: 1.5;
+}
+
+body {
+  background: #eeeae3;
 }
 
 .container {
@@ -10,7 +22,6 @@
   justify-content: center;
   flex-direction: column;
   min-height: 100vh;
-  background: #eeeae3;
   color: #333;
   letter-spacing: 0.1em;
 }
@@ -32,6 +43,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  font-family: sans-serif;
   font-size: 2rem;
   border: none;
   background: #f2f2f0;
