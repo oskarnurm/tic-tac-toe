@@ -1,6 +1,5 @@
 function Gameboard() {
   const board = [];
-
   for (let i = 0; i < 3; i++) {
     board[i] = [];
     for (let j = 0; j < 3; j++) {
@@ -23,10 +22,7 @@ function Gameboard() {
 function Cell() {
   let value = null;
 
-  const addToken = (token) => {
-    value = token;
-  };
-
+  const addToken = (token) => (value = token);
   const getValue = () => value;
 
   return { addToken, getValue };
@@ -54,63 +50,56 @@ function checkWinner(board) {
   });
 }
 
-function GameController(
-  playerOneName = "Player One",
-  playerTwoName = "Player Two",
-) {
-  let drawCount = 0;
+function GameController(p1 = "Player One", p2 = "Player Two") {
+  let moves = 0;
+  let gameOver = false;
   const board = Gameboard();
 
   const players = [
-    { name: playerOneName, token: "O", score: 0 },
-    { name: playerTwoName, token: "X", score: 0 },
+    { name: p1, token: "O", score: 0 },
+    { name: p2, token: "X", score: 0 },
   ];
 
-  let activePlayer = players[0];
-
-  const setPlayerNames = (playerOne, playerTwo) => {
-    players[0].name = playerOne.trim();
-    players[1].name = playerTwo.trim();
+  const setPlayerNames = (a, b) => {
+    players[0].name = (a ?? "").trim() || "Player One";
+    players[1].name = (b ?? "").trim() || "Player Two";
   };
 
+  let activePlayer = players[0];
   const switchPlayerTurn = () => {
     activePlayer = activePlayer === players[0] ? players[1] : players[0];
   };
 
   const getActivePlayer = () => activePlayer;
-
   const getPlayers = () => players;
+  const isGameOver = () => gameOver;
+  const isWinner = () => checkWinner(board.getBoard());
+  const isTie = () => moves === board.capacity() && !isWinner();
 
-  const resetPlayerScores = () => {
-    ((players[0].score = 0), (players[1].score = 0));
-  };
-
-  const getWinner = () => checkWinner(board.getBoard());
-
-  const isTie = () => drawCount === board.isFull() && !getWinner();
-
-  const playRound = (column, row) => {
+  const playRound = (row, col) => {
+    if (gameOver) return { state: "locked" };
     // Don't let the user set a token to a cell that already has one
-    if (!board.setToken(row, column, getActivePlayer().token)) {
-      return;
-    }
-    drawCount++;
+    if (!board.setToken(row, col, activePlayer.token))
+      return { state: "invalid" };
 
-    // Check for win
-    if (checkWinner(board.getBoard())) {
-      return;
-    }
+    moves++;
 
-    // Check for tie
-    if (drawCount === board.isFull()) {
-      return;
+    if (isWinner()) {
+      activePlayer.score++;
+      gameOver = true;
+      return { state: "win", winner: activePlayer };
     }
-
+    if (moves === board.capacity()) {
+      gameOver = true;
+      return { state: "tie" };
+    }
     switchPlayerTurn();
+    return { state: "continue" };
   };
 
   const resetRound = () => {
-    drawCount = 0;
+    moves = 0;
+    gameOver = false;
     activePlayer = players[0];
     board
       .getBoard()
@@ -118,16 +107,20 @@ function GameController(
       .forEach((cell) => cell.addToken(null));
   };
 
+  const resetPlayerScores = () => {
+    players[0].score = 0;
+    players[1].score = 0;
+  };
+
   return {
     playRound,
     getActivePlayer,
     getBoard: board.getBoard,
-    getWinner,
-    isTie,
     resetRound,
     resetPlayerScores,
     setPlayerNames,
     getPlayers,
+    isGameOver,
   };
 }
 
@@ -136,27 +129,18 @@ function ScreenController() {
 
   const playerTurnDiv = document.querySelector(".turn");
   const boardDiv = document.querySelector(".board");
-  const popupDiv = document.querySelector(".popup");
+  const popupDiv = document.getElementById("popup");
   const player1Div = document.querySelector(".score .player1");
   const player2Div = document.querySelector(".score .player2");
-
   const formDiv = document.querySelector(".form");
 
-  window.onload = () => {
-    document.querySelector(".welcome").showModal();
-  };
+  window.onload = () => document.querySelector(".welcome").showModal();
 
   formDiv.addEventListener("submit", () => {
-    const input1 = formDiv.elements.player1.value;
-    const input2 = formDiv.elements.player2.value;
-
-    // Set default names if the user did not provide any
-    const playerOne = input1 === "" ? "Player One" : input1;
-    const playerTwo = input2 === "" ? "Player Two" : input2;
-
-    game.setPlayerNames(playerOne, playerTwo);
-    updateScreen();
+    const { player1, player2 } = formDiv.elements;
+    game.setPlayerNames(player1.value, player2.value);
     formDiv.reset();
+    updateScreen();
   });
 
   function updateScores() {
@@ -167,67 +151,63 @@ function ScreenController() {
 
   const updateScreen = () => {
     boardDiv.textContent = "";
-
-    // Update game info in-between rounds
     const board = game.getBoard();
     const activePlayer = game.getActivePlayer();
 
-    if (game.getWinner()) {
-      activePlayer.score++;
-      popupDiv.querySelector(".result").textContent =
-        `${activePlayer.name} wins!`;
-      popupDiv.showModal();
-    } else if (game.isTie()) {
-      popupDiv.querySelector(".result").textContent = `Tie!`;
-      popupDiv.showModal();
+    if (game.isGameOver()) {
+      // Keep the board frozen; popup is handled in the click handler.
+      playerTurnDiv.textContent = "";
     } else {
       playerTurnDiv.textContent = `${activePlayer.name}'s turn`;
     }
 
     // Render board
-    board.forEach((row, rowIndex) => {
-      row.forEach((cell, columnIndex) => {
+    board.forEach((row, rowIdx) => {
+      row.forEach((cell, colIdx) => {
         const cellButton = document.createElement("button");
         cellButton.classList.add("cell");
-        cellButton.dataset.column = columnIndex;
-        cellButton.dataset.row = rowIndex;
+        cellButton.dataset.column = colIdx;
+        cellButton.dataset.row = rowIdx;
         cellButton.textContent = cell.getValue();
         boardDiv.appendChild(cellButton);
       });
     });
+
     updateScores();
   };
 
   // Add event listener for the board
-  function clickHandlerBoard(e) {
-    const selectedColumn = e.target.dataset.column;
-    const selectedRow = e.target.dataset.row;
-    // Make sure I've clicked a cell and not the gaps in between
-    if (!selectedColumn && !selectedRow) return;
+  boardDiv.addEventListener("click", (e) => {
+    if (!e.target.classList.contains("cell")) return;
 
-    game.playRound(selectedColumn, selectedRow);
+    const row = Number(e.target.dataset.row);
+    const col = Number(e.target.dataset.column);
+    const result = game.playRound(row, col);
+
+    if (result?.state === "win") {
+      popupDiv.querySelector(".result").textContent =
+        `${result.winner.name} wins!`;
+      popupDiv.showModal();
+    } else if (result?.state === "tie") {
+      popupDiv.querySelector(".result").textContent = "Tie!";
+      popupDiv.showModal();
+    }
+
     updateScreen();
-  }
-  boardDiv.addEventListener("click", clickHandlerBoard);
+  });
 
-  function resetRound() {
-    game.resetRound();
-    boardDiv.querySelectorAll(".cell").forEach((btn) => (btn.textContent = ""));
-    playerTurnDiv.textContent = `${game.getActivePlayer().name}'s turn`;
-  }
-
+  // Handle popup footer buttons
   popupDiv.addEventListener("close", () => {
     const response = popupDiv.returnValue;
     if (response === "next") {
-      resetRound();
+      game.resetRound();
     } else if (response === "reset") {
-      resetRound();
-      game.resetPlayerScores();
-      updateScores();
-    } else {
-      return;
+      game.resetRound();
+      game.resetPlayerScores?.();
     }
+    updateScreen();
   });
+
   // Initial render
   updateScreen();
 }

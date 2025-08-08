@@ -109,27 +109,27 @@ dialog[open] {
   outline: none;
 }
 
-.popup header,
-.popup footer,
-.popup section {
+#popup header,
+#popup footer,
+#popup section {
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 1rem;
 }
 
-.popup header {
+#popup header {
   justify-content: space-between;
   background: #f5f5f5;
   border-bottom: 1px solid #e0e0e0;
 }
 
-.popup header h3 {
+#popup header h3 {
   margin: 0;
   font-size: 1.1rem;
 }
 
-.popup header button {
+#popup header button {
   background: none;
   border: none;
   font-size: 1.2rem;
@@ -138,24 +138,24 @@ dialog[open] {
   transition: color 0.2s ease;
 }
 
-.popup header button:hover {
+#popup header button:hover {
   color: #333;
 }
 
-.popup section {
+#popup section {
   padding: 0.5rem;
   color: #333;
   font-size: 1rem;
 }
 
-.popup footer {
+#popup footer {
   justify-content: flex-end;
   gap: 0.5rem;
   background: #fafafa;
   border-top: 1px solid #e0e0e0;
 }
 
-.popup footer button {
+#popup footer button {
   padding: 0.5rem 1rem;
   font-size: 0.95rem;
   border: none;
@@ -165,11 +165,11 @@ dialog[open] {
   transition: background 0.2s ease;
 }
 
-.popup footer button:hover {
+#popup footer button:hover {
   background-color: #d4d4d4;
 }
 
-.popup::backdrop {
+#popup::backdrop {
   background-color: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(3px);
 }
