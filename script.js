@@ -90,7 +90,7 @@ function GameController(p1 = "Player One", p2 = "Player Two") {
       gameOver = true;
       return { state: "win", winner: activePlayer };
     }
-    if (moves === board.capacity()) {
+    if (isTie()) {
       gameOver = true;
       return { state: "tie" };
     }
